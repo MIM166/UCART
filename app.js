@@ -201,7 +201,7 @@ app.post('/customerhome', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   });
-
+console.log("mim");
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
