@@ -298,8 +298,8 @@ app.post('/customerhome', async (req, res) => {
     }
     })
     
-   console.log("tmrheda");
-    
+ console.log('bal er dvijbfnj');
+     
     
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
