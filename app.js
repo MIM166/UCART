@@ -298,7 +298,7 @@ app.post('/customerhome', async (req, res) => {
     }
     })
     
-    console.log('antyhj')  ;  
+    console.log('kutta')  ;  
     
     
 app.listen(port, () => {
