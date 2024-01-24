@@ -298,7 +298,7 @@ app.post('/customerhome', async (req, res) => {
     }
     })
     
-   console.log(asigigiu);
+ console.log('bal er project');
     
     
 app.listen(port, () => {
