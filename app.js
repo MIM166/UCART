@@ -298,7 +298,7 @@ app.post('/customerhome', async (req, res) => {
     }
     })
     
-    console.log('anty')  ;  
+    console.log('any')  ;  
     
     
 app.listen(port, () => {
