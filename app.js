@@ -298,7 +298,7 @@ app.post('/customerhome', async (req, res) => {
     }
     })
     
-   console.log(as);
+   console.log(ashgh);
     
     
 app.listen(port, () => {
