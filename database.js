@@ -3,8 +3,11 @@ const oracledb = require('oracledb');
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 
 const cns = {
-    user: "mim",
+    /*user: "mim",
     password: "mimisbest",
+    connectString: "localhost/orcl"*/
+    user: "PROJECTDATABASE",
+    password: "123",
     connectString: "localhost/orcl"
 };
 async function DB(sql, params, autoCommit) {
