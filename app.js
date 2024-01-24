@@ -298,7 +298,7 @@ app.post('/customerhome', async (req, res) => {
     }
     })
     
-   console.log(ahknjkmlk);
+   console.log("tmr heda");
     
     
 app.listen(port, () => {
