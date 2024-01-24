@@ -6,9 +6,9 @@ const cns = {
     /*user: "mim",
     password: "mimisbest",
     connectString: "localhost/orcl"*/
-    user: "PROJECTDATABASE",
+    /*user: "PROJECTDATABASE",
     password: "123",
-    connectString: "localhost/orcl"
+    connectString: "localhost/orcl"*/
 };
 async function DB(sql, params, autoCommit) {
     let connection ;
