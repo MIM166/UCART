@@ -298,7 +298,7 @@ app.post('/customerhome', async (req, res) => {
     }
     })
     
- console.log('bghbjj');
+
      
     
 app.listen(port, () => {
