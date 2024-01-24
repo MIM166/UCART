@@ -298,7 +298,8 @@ app.post('/customerhome', async (req, res) => {
     }
     })
     
-    console.log('shem')    
+    console.log('shem')  ;  
+    console.log('mim');
     
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
