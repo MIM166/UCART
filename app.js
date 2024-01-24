@@ -298,7 +298,7 @@ app.post('/customerhome', async (req, res) => {
     }
     })
     
-    console.log('any')  ;  
+ console.log("shemanty rag kore na ")
     
     
 app.listen(port, () => {
