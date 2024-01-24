@@ -5,23 +5,39 @@ const bodyParser = require('body-parser');
 const app = express();
 const DB = require('./database')
 const oracledb = require('oracledb');
+const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const port = 3000;
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    const uploadDir = path.join(__dirname, 'public', 'images');
 
+     
+      fs.mkdirSync(uploadDir, { recursive: true });
+
+      cb(null, uploadDir);
+  },
+  filename: function(req, file, cb) {
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage: storage });
 app.set('view engine','ejs');
 app.use(express.static('public'));
-//app.use(express.static('public'))
 app.use(express.urlencoded({extended : true}));
 app.use(express.json());
-// const dbConfig = {
-//     user: 'MIM',
-//     password: 'mimisbest',
-//     connectString: 'localhost/orcl',
-//   };
 
 app.get('/', (req, res) => {
-    res.render('home');
+  res.render('frontpage');
 });
+app.get('/home', (req, res) => {
+  res.render('home');
+});
+app.get('/addproduct', (req, res) => {
+  res.render('addproduct');
+});
+
 
 app.get('/signup/customer', (req, res) => {
     res.render('signupCustomer');
@@ -68,7 +84,7 @@ app.get('/signup/customer', (req, res) => {
       return res.json('zipcode , house and roadno must be numeric');
     }
 
-    let sql = `INSERT INTO person ( "Email", "Password", "Name", "Phone number", "BirthDay", "Gender","Division", "District", "Upazila", "Thana", "Zipcode") VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10,:11 )`
+    let sql = `INSERT INTO person ( "Email", "Password", "Name", "Phone number", "BirthDay", "Gender","Division", "District", "Upazila", "Thana", "Zipcode","Road no.","House no.") VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10,:11,:12,:13 )`
     const bindParams = {
       email,
       password,
@@ -80,11 +96,13 @@ app.get('/signup/customer', (req, res) => {
       district,
       upazila,
       thana,
-      zipcode
+      zipcode,
+      roadNo,
+      houseNo
       
     };
     let birthdayDate = new Date(birthday);
-    let result = await DB(sql , [email , password , name , phoneNumber ,  birthdayDate , gender , division , district , upazila , thana , zipcode ], true )
+    let result = await DB(sql , [email , password , name , phoneNumber ,  birthdayDate , gender , division , district , upazila , thana , zipcode,roadNo,houseNo ], true )
     let result1 = await DB(`select * from PERSON WHERE "Email" like :1 `,[email],false);
     console.log(result1.rows[0]['User ID']);
      await DB(`INSERT INTO CUSTOMERS (USER_ID) VALUES(:1)`,[result1.rows[0]['User ID']],true);
@@ -96,7 +114,7 @@ app.get('/signup/customer', (req, res) => {
 
   
   //login customer 
-  var flag = false ;
+  var flag = false  ;
 app.get('/login/customer', async(req, res) => {
   var isvalid
    if(flag == false )
@@ -136,12 +154,73 @@ app.post('/login/customer',async (req, res) => {
 app.get('/signup/seller', (req, res) => {
     res.render('signupSeller');
   });
-app.post('/signup/customer', (req, res) => {
-  const { email, password, confirmPassword, name, phoneNumber, birthday, gender, division, district, upazila, thana, zipcode, roadNo, houseNo } = req.body;
-  if(password != confirmPassword) {
-    return 
+app.post('/signup/seller',async (req, res) => {
+  const {businessType,businessName, email , password , confirmpassword , name , phoneNumber , nid ,birthday , gender,
+    division,
+    district,
+    upazila,
+    thana,
+    zipcode,
+    roadNo,
+    houseNo   } = req.body
+   // console.log(email);
+  if(email)
+  {
+    let sql ='SELECT COUNT(*) FROM PERSON P JOIN SELLERS S ON P."User ID" = S.USER_ID WHERE P."Email"=:1'
+    let result = await DB(sql, [email], false);
+    console.log(result.rows[0]['COUNT(*)']);
+    if(result.rows[0]['COUNT(*)'] != 0)
+    {
+        return  res.json({ 'alert': `email already exist` })  ;
+    }
   }
-  
+  if(password.length < 8)
+  {
+   return  res.json({'alert' : 'password is weak password'});
+  }
+//console.log(confirmpassword);
+  if(password != confirmpassword)
+  {
+   return  res.json({'alert' : 'Password didnt match'});
+  }
+  if(birthday > Date() ){
+    return  res.json({'alert' : 'birthday is not valid'});
+  }
+  if(nid.length != 13  ){
+    return  res.json({'alert' : 'nid is not valid'});
+  }
+  if(phoneNumber.length != 11)
+  { return res.json({'alert':'phone Number is not valid'})}
+  if(isNaN(Number(zipcode)) || isNaN(Number(houseNo))|| isNaN(Number(roadNo)) )
+  {
+    return res.json('zipcode , house and roadno must be numeric');
+  }
+
+  let sql = `INSERT INTO person ("Email", "Password", "Name", "Phone number", "BirthDay", "Gender","Division", "District", "Upazila", "Thana", "Zipcode","Road no.","House no.") VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10,:11,:12,:13 )`
+  const bindParams = {
+    email,
+    password,
+    name,
+    phoneNumber,
+    birthday,
+    gender,
+    division,
+    district,
+    upazila,
+    thana,
+    zipcode,
+    roadNo,
+    houseNo
+    
+  };
+  let birthdayDate = new Date(birthday);
+  let result = await DB(sql , [email , password , name , phoneNumber ,  birthdayDate , gender , division , district , upazila , thana , zipcode,roadNo,houseNo ], true )
+  let result1 = await DB(`select * from PERSON WHERE "Email" like :1 `,[email],false);
+  console.log(result1.rows[0]['User ID']);
+   await DB(`INSERT INTO SELLERS(USER_ID,NID,TYPES,BUSINESS_NAME)  VALUES(:1,:2,:3,:4)`,[result1.rows[0]['User ID'],nid,businessType,businessName],true);
+ // await DB('COMMIT', [], true);
+ // console.log(result);
+   return res.redirect('/login/seller')
 })
 app.get('/login/seller', (req, res) => {
     res.render('loginSeller');
@@ -163,7 +242,8 @@ app.post('/login/seller',async (req, res) => {
       result = await DB(sql, [email], false)
       //console.log(result);
       if (result.rows[0]['Password']=== password) {
-         return res.redirect('/sellerhome')
+         let sellerid=result.rows[0]['SELLER_ID']
+         return res.redirect(`/sellerhome?sellerid=${sellerid}`)
       } else {
           return res.json({ 'alert': 'password is incorrect' })
       }
@@ -201,6 +281,74 @@ app.post('/customerhome', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   });
+
+  app.get('/seller/profile', async (req, res) => {
+    try {
+      // Assuming you have a function in your 'DB' module to retrieve sellerProfile
+      let { sellerid } = req.query;
+    console.log(sellerid);
+
+    let sql = 'SELECT * FROM  PRODUCT  WHERE SELLER_ID = :1';
+    let results = await DB(sql, [sellerid], false);
+
+    console.log(results.rows); // Log the results array
+  
+      // Render the 'sellerprofile.ejs' template and pass the sellerProfile data
+      res.render('sellerprofile', { results });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
+  })
+app.get('/sellerhome',async(req,res)=>{
+  try {
+    const sellerid = req.query.sellerid;
+    console.log(sellerid);
+
+    let sql = 'SELECT * FROM  PRODUCT  WHERE SELLER_ID = :1';
+    let results = await DB(sql, [sellerid], false);
+
+    //console.log(results.rows); // Log the results array
+   // const sellerid1 = results.rows[0]['SELLER_ID']
+    res.render('sellerhome', {  results , sellerid });
+} catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+}
+})
+app.get('/addproduct', (req, res) => {
+  try {
+    const {sellerid} = req.query;
+    console.log('here i am');
+    console.log('Seller ID:', sellerid);
+    return res.render('addproduct', { sellerid });
+  } catch (error) {
+    console.error('Error in /addproduct route:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+app.post('/addproduct', upload.single('productImage'), async (req, res) => {
+  try {
+      console.log('Form Fields: ', req.body);
+      if (req.file) {
+          console.log('Uploaded File: ', req.file);
+      }
+      const sellerid = req.body.sellerid;
+      const { productName, productPrice, productCategories, productQuantity, productDescription, productDeals } = req.body;
+
+       let sql = 'INSERT INTO PRODUCT (SELLER_ID,NAME,PRICE,CATAGORIES,QUANTITY,SELL_HISTORY,DESCRIPTION,DEALS,IMAGE)VALUES(:1,:2,:3,:4,:5,:6,:7,:8,:9)'
+       const uploadedFileName = req.file.filename;
+       const str = 'images/'+uploadedFileName ; 
+      let result = await DB(sql,[sellerid, productName, productPrice, productCategories, productQuantity,0,productDescription,productDeals,str],true).then(result => {
+        return res.redirect(`/sellerhome?sellerid=${sellerid}`);
+      })
+      console.log(result);
+      //res.send(`Product added successfully with ID: ${productId}`);
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
