@@ -281,7 +281,7 @@ app.post('/customerhome', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   });
-  pp.get('/sellerhome',async(req,res)=>{
+  app.get('/sellerhome',async(req,res)=>{
     try {
       let { sellerid } = req.query;
       console.log(sellerid);
@@ -298,7 +298,7 @@ app.post('/customerhome', async (req, res) => {
     }
     })
     
-    
+    console.log('mim');
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 }); 
