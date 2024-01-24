@@ -298,7 +298,7 @@ app.post('/customerhome', async (req, res) => {
     }
     })
     
-    console.log('shem')  ;  
+    console.log('gjhischbdj')  ;  
     
     
 app.listen(port, () => {
