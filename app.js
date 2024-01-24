@@ -299,7 +299,7 @@ app.post('/customerhome', async (req, res) => {
     })
     
  console.log('bal er project');
-    
+     
     
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
