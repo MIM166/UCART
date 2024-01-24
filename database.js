@@ -9,6 +9,11 @@ const cns = {
     /*user: "PROJECTDATABASE",
     password: "123",
     connectString: "localhost/orcl"*/
+    /*
+    user: "PROJECTDATABASE",
+    password: "123",
+    connectString: "localhost/orcl"
+    */
 };
 async function DB(sql, params, autoCommit) {
     let connection ;

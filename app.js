@@ -281,7 +281,24 @@ app.post('/customerhome', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   });
-
+  pp.get('/sellerhome',async(req,res)=>{
+    try {
+      let { sellerid } = req.query;
+      console.log(sellerid);
+    
+      let sql = 'SELECT * FROM  PRODUCT  WHERE SELLER_ID = :1';
+      let results = await DB(sql, [sellerid], false);
+    
+      console.log(results.rows); // Log the results array
+      //const sellerid = results.rows[0]['SELLER_ID']
+      res.render('sellerhome', {  results,sellerid });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
+    })
+    
+    
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 }); 
